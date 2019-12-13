@@ -1,10 +1,7 @@
 package logickt
 
-import funkt.Assoc
-import funkt.Option
+import funkt.*
 import funkt.Option.Companion.some
-import funkt.assoc
-import funkt.lookup
 import logickt.List.Variable
 
 typealias Substitution<A> = Assoc<Variable, List<A>>
@@ -41,3 +38,17 @@ fun <A> unify(u: List<A>, v: List<A>, s: Substitution<A>): Option<Substitution<A
             }
         }
     }
+
+typealias Goal<A> = (Substitution<A>) -> Stream<Substitution<A>>
+
+fun <A> equiv(u: List<A>, v: List<A>): Goal<A> = {
+    unify(u, v, it).toStream()
+}
+
+fun <A> success(): Goal<A> = {
+    Stream(it)
+}
+
+fun <A> failure(): Goal<A> = {
+    Stream()
+}

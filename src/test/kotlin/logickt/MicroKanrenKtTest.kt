@@ -22,6 +22,9 @@ internal class MicroKanrenKtTest {
     private val a = atom('a')
     private val e = atom('e')
 
+    private val t = atom(true)
+    private val f = atom(false)
+
     @Test
     internal fun testWalk() {
         assertEquals(a, walk(z, Assoc(z to a, x to w, y to z)))
@@ -55,5 +58,14 @@ internal class MicroKanrenKtTest {
         assertEquals(some(Assoc(y to a, x to e)), unify(cons(x, a), cons(e, y), Assoc()))
         assertEquals(Option<Substitution<Char>>(), unify(cons(a, x), cons(e, y), Assoc()))
         assertEquals(Option<Substitution<Char>>(), unify(cons(x, a), cons(e, y), Assoc(x to a)))
+    }
+
+    @Test
+    internal fun testEquiv() {
+        assertEquals(listOf<Substitution<*>>(), equiv(t, f)(Substitution()).asIterable().toList())
+        assertEquals(listOf<Substitution<*>>(), failure<Nothing>()(Substitution()).asIterable().toList())
+        assertEquals(listOf(Substitution<Nothing>()), equiv(f, f)(Substitution()).asIterable().toList())
+        assertEquals(listOf(Substitution<Nothing>()), success<Nothing>()(Substitution()).asIterable().toList())
+        assertEquals(listOf(Substitution(x to y)), equiv(x, y)(Substitution()).asIterable().toList())
     }
 }
