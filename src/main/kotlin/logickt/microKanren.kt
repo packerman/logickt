@@ -24,22 +24,20 @@ fun <A> occurs(x: Variable, v: List<A>, s: Substitution<A>): Boolean =
         }.getOrElse(false)
     }
 
-fun <A> unify(u: List<A>, v: List<A>, s: Substitution<A>): Option<Substitution<A>> {
-    val wu = walk(u, s)
-    val wv = walk(v, s)
-    if (wu == wv) {
-        return some(s)
-    }
-    return wu.getVariable().flatMap { extendSubstitution(it, wv, s) }.orElse {
-        wv.getVariable().flatMap { extendSubstitution(it, wu, s) }.orElse {
-            wu.getPair().flatMap { (carU, cdrU) ->
-                wv.getPair().flatMap { (carV, cdrV) ->
-                    unify(carU, carV, s).flatMap {
-                        unify(cdrU, cdrV, it)
+fun <A> unify(u: List<A>, v: List<A>, s: Substitution<A>): Option<Substitution<A>> =
+    walk(u, s).let { wu ->
+        walk(v, s).let { wv ->
+            if (wu == wv) some(s)
+            else wu.getVariable().flatMap { extendSubstitution(it, wv, s) }.orElse {
+                wv.getVariable().flatMap { extendSubstitution(it, wu, s) }.orElse {
+                    wu.getPair().flatMap { (carU, cdrU) ->
+                        wv.getPair().flatMap { (carV, cdrV) ->
+                            unify(carU, carV, s).flatMap {
+                                unify(cdrU, cdrV, it)
+                            }
+                        }
                     }
                 }
             }
         }
     }
-}
-
