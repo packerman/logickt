@@ -62,10 +62,25 @@ internal class MicroKanrenKtTest {
 
     @Test
     internal fun testEquiv() {
-        assertEquals(listOf<Substitution<*>>(), equiv(t, f)(Substitution()).asIterable().toList())
-        assertEquals(listOf<Substitution<*>>(), failure<Nothing>()(Substitution()).asIterable().toList())
-        assertEquals(listOf(Substitution<Nothing>()), equiv(f, f)(Substitution()).asIterable().toList())
-        assertEquals(listOf(Substitution<Nothing>()), success<Nothing>()(Substitution()).asIterable().toList())
-        assertEquals(listOf(Substitution(x to y)), equiv(x, y)(Substitution()).asIterable().toList())
+        assertEquals(
+            listOf<Substitution<*>>(), equiv(t, f)(Substitution())
+                .asIterable().toList()
+        )
+        assertEquals(
+            listOf<Substitution<*>>(), failure<Nothing>()(Substitution())
+                .asIterable().toList()
+        )
+        assertEquals(
+            listOf(Substitution<Nothing>()), equiv(f, f)(Substitution())
+                .asIterable().toList()
+        )
+        assertEquals(
+            listOf(Substitution<Nothing>()), success<Nothing>()(Substitution())
+                .asIterable().toList()
+        )
+        assertEquals(
+            listOf(Substitution(x to y)), equiv(x, y)(Substitution())
+                .asIterable().toList()
+        )
     }
 }
