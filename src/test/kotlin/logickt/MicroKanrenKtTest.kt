@@ -54,5 +54,6 @@ internal class MicroKanrenKtTest {
         assertEquals(some(Assoc(y to a)), unify(a, y, Assoc()))
         assertEquals(some(Assoc(y to a, x to e)), unify(cons(x, a), cons(e, y), Assoc()))
         assertEquals(Option<Substitution<Char>>(), unify(cons(a, x), cons(e, y), Assoc()))
+        assertEquals(Option<Substitution<Char>>(), unify(cons(x, a), cons(e, y), Assoc(x to a)))
     }
 }
