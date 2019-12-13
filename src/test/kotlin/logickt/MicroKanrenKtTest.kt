@@ -4,6 +4,7 @@ import funkt.Assoc
 import funkt.Option
 import funkt.Option.Companion.some
 import logickt.List.Companion.atom
+import logickt.List.Companion.cons
 import logickt.List.Companion.list
 import logickt.List.Companion.variable
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -44,5 +45,14 @@ internal class MicroKanrenKtTest {
     internal fun testOccurs() {
         assertTrue(occurs(x, x, Assoc()))
         assertTrue(occurs(x, list(y), Assoc(y to x)))
+    }
+
+    @Test
+    internal fun testUnify() {
+        assertEquals(some(Substitution<Char>()), unify(a, a, Assoc()))
+        assertEquals(some(Assoc(x to a)), unify(x, a, Assoc()))
+        assertEquals(some(Assoc(y to a)), unify(a, y, Assoc()))
+        assertEquals(some(Assoc(y to a, x to e)), unify(cons(x, a), cons(e, y), Assoc()))
+        assertEquals(Option<Substitution<Char>>(), unify(cons(a, x), cons(e, y), Assoc()))
     }
 }
