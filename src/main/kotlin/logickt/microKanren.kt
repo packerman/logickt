@@ -69,7 +69,7 @@ fun <R> fresh(name: String, f: (Variable) -> R): R =
 
 fun <A> walkRec(v: List<A>, s: Substitution<A>): List<A> =
     walk(v, s).let { w ->
-        w.getVariable().map { it as List<A> }.orElse {
+        w.getVariable().map<List<A>> { it }.orElse {
             w.getPair().map { (car, cdr) ->
                 cons(walkRec(car, s), walkRec(cdr, s))
             }
@@ -92,3 +92,9 @@ fun <A> reify(v: List<A>): ((Substitution<A>) -> List<A>) = { s ->
         walkRec(w, reifySubstitution(w, Substitution()))
     }
 }
+
+fun <A> runGoal(g: Goal<A>): Stream<Substitution<A>> =
+    g(Substitution())
+
+fun <A> runGoal(n: Int, g: Goal<A>): Stream<Substitution<A>> =
+    runGoal(g).take(n)

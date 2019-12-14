@@ -125,6 +125,15 @@ internal class MicroKanrenKtTest {
         val a2 = y to corn
         val a3 = w to list(v, u)
         val s = Substitution(a1, a2, a3)
-        assertEquals(list(_0, list(_1, _0), corn, _2, list(list(ice), _2)), reify(x as List<Eat>)(s))
+        assertEquals(list(_0, list(_1, _0), corn, _2, list(list(ice), _2)), reify<Eat>(x)(s))
+    }
+
+    @Test
+    internal fun testRunGoal() {
+        assertStreamEquals(
+            listOf(olive, oil),
+            runGoal(5,
+                disj2(equiv(olive, x), equiv(oil, x)))
+                .map(reify<Eat>(x)))
     }
 }
