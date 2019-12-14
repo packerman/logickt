@@ -3,6 +3,7 @@ package logickt
 import funkt.*
 import funkt.Option.Companion.some
 import logickt.List.Companion.cons
+import logickt.List.Companion.reifyName
 import logickt.List.Companion.variable
 import logickt.List.Variable
 
@@ -73,4 +74,15 @@ fun <A> walkRec(v: List<A>, s: Substitution<A>): List<A> =
                 cons(walkRec(car, s), walkRec(cdr, s))
             }
         }.getOrElse(w)
+    }
+
+fun <A> reifySubstitution(v: List<A>, r: Substitution<A>): Substitution<A> =
+    walk(v, r).let { w ->
+        w.getVariable().map {
+            r.assoc(it, reifyName(r.length))
+        }.orElse {
+            w.getPair().map { (car, cdr) ->
+                reifySubstitution(cdr, reifySubstitution(car, r))
+            }
+        }.getOrElse(r)
     }
