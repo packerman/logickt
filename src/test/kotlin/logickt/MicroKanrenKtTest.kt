@@ -1,16 +1,14 @@
 package logickt
 
-import funkt.Assoc
 import funkt.Option
 import funkt.Option.Companion.some
 import funkt.toStream
-import logickt.Fruit.Plum
+import logickt.Eat.*
 import logickt.List.Companion.atom
 import logickt.List.Companion.cons
 import logickt.List.Companion.list
+import logickt.List.Companion.reifyName
 import logickt.List.Companion.variable
-import logickt.Luquid.Oil
-import logickt.Luquid.Olive
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -20,6 +18,7 @@ internal class MicroKanrenKtTest {
     private val x = variable("x")
     private val y = variable("y")
     private val z = variable("z")
+    private val u = variable("u")
     private val w = variable("w")
     private val v = variable("v")
 
@@ -33,40 +32,46 @@ internal class MicroKanrenKtTest {
     private val olive = atom(Olive)
     private val oil = atom(Oil)
     private val plum = atom(Plum)
+    private val ice = atom(Ice)
+    private val corn = atom(Corn)
+
+    private val _0 = reifyName(0)
+    private val _1 = reifyName(1)
+    private val _2 = reifyName(2)
 
     @Test
     internal fun testWalk() {
-        assertEquals(a, walk(z, Assoc(z to a, x to w, y to z)))
-        assertEquals(a, walk(y, Assoc(z to a, x to w, y to z)))
-        assertEquals(w, walk(x, Assoc(z to a, x to w, y to z)))
-        assertEquals(y, walk(x, Assoc(x to y, v to x, w to x)))
-        assertEquals(y, walk(v, Assoc(x to y, v to x, w to x)))
-        assertEquals(y, walk(w, Assoc(x to y, v to x, w to x)))
-        assertEquals(list(x, e, z), walk(w, Assoc(x to b, z to y, w to list(x, e, z))))
+        assertEquals(a, walk(z, Substitution(z to a, x to w, y to z)))
+        assertEquals(a, walk(y, Substitution(z to a, x to w, y to z)))
+        assertEquals(w, walk(x, Substitution(z to a, x to w, y to z)))
+        assertEquals(y, walk(x, Substitution(x to y, v to x, w to x)))
+        assertEquals(y, walk(v, Substitution(x to y, v to x, w to x)))
+        assertEquals(y, walk(w, Substitution(x to y, v to x, w to x)))
+        assertEquals(list(x, e, z), walk(w, Substitution(x to b, z to y, w to list(x, e, z))))
     }
 
     @Test
     internal fun testExtendSubstitution() {
-        assertEquals(Option<Any>(), extendSubstitution(x, list(x), Assoc()))
-        assertEquals(Option<Any>(), extendSubstitution(x, list(y), Assoc(y to x)))
-        val s = Assoc(z to x, y to z)
+        assertEquals(Option<Any>(), extendSubstitution(x, list(x), Substitution()))
+        assertEquals(Option<Any>(), extendSubstitution(x, list(y), Substitution(y to x)))
+        val s = Substitution(z to x, y to z)
         assertEquals(some(e), extendSubstitution(x, e, s).map { walk(y, it) })
     }
 
     @Test
     internal fun testOccurs() {
-        assertTrue(occurs(x, x, Assoc()))
-        assertTrue(occurs(x, list(y), Assoc(y to x)))
+        assertTrue(occurs(x, x, Substitution()))
+        assertTrue(occurs(x, list(y), Substitution(y to x)))
     }
 
     @Test
     internal fun testUnify() {
-        assertEquals(some(Substitution<Char>()), unify(a, a, Assoc()))
-        assertEquals(some(Assoc(x to a)), unify(x, a, Assoc()))
-        assertEquals(some(Assoc(y to a)), unify(a, y, Assoc()))
-        assertEquals(some(Assoc(y to a, x to e)), unify(cons(x, a), cons(e, y), Assoc()))
-        assertEquals(Option<Substitution<Char>>(), unify(cons(a, x), cons(e, y), Assoc()))
-        assertEquals(Option<Substitution<Char>>(), unify(cons(x, a), cons(e, y), Assoc(x to a)))
+        assertEquals(some(Substitution<Char>()), unify(a, a, Substitution()))
+        assertEquals(some(Substitution(x to a)), unify(x, a, Substitution()))
+        assertEquals(some(Substitution(y to a)), unify(a, y, Substitution()))
+        assertEquals(some(Substitution(y to a, x to e)), unify(cons(x, a), cons(e, y), Substitution()))
+        assertEquals(Option<Substitution<Char>>(), unify(cons(a, x), cons(e, y), Substitution()))
+        assertEquals(Option<Substitution<Char>>(), unify(cons(x, a), cons(e, y), Substitution(x to a)))
     }
 
     @Test
@@ -111,6 +116,15 @@ internal class MicroKanrenKtTest {
 
     @Test
     internal fun walkRecursively() {
-        assertEquals(list(b, e, y), walkRec(w, Assoc(x to b, z to y, w to list(x, e, z))))
+        assertEquals(list(b, e, y), walkRec(w, Substitution(x to b, z to y, w to list(x, e, z))))
+    }
+
+    @Test
+    internal fun testReify() {
+        val a1 = x to list(u, w, y, z, list(list(ice), z))
+        val a2 = y to corn
+        val a3 = w to list(v, u)
+        val s = Substitution(a1, a2, a3)
+        assertEquals(list(_0, list(_1, _0), corn, _2, list(list(ice), _2)), reify(x as List<Eat>)(s))
     }
 }

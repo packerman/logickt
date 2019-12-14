@@ -86,3 +86,9 @@ fun <A> reifySubstitution(v: List<A>, r: Substitution<A>): Substitution<A> =
             }
         }.getOrElse(r)
     }
+
+fun <A> reify(v: List<A>): ((Substitution<A>) -> List<A>) = { s ->
+    walkRec(v, s).let { w ->
+        walkRec(w, reifySubstitution(w, Substitution()))
+    }
+}

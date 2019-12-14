@@ -11,14 +11,22 @@ sealed class List<out A> {
         else -> Option()
     }
 
-    internal object Nil : List<Nothing>()
+    internal object Nil : List<Nothing>() {
+
+        override fun toString(): String = "Nil"
+    }
 
     internal data class Atom<A>(val value: A) : List<A>() {
 
         override fun toString(): String = value.toString()
     }
 
-    internal data class Cons<A>(val car: List<A>, val cdr: List<A>) : List<A>()
+    internal data class Cons<A>(val car: List<A>, val cdr: List<A>) : List<A>() {
+
+        override fun toString(): String {
+            return "Cons($car, $cdr)"
+        }
+    }
 
     class Variable internal constructor(val name: String) : List<Nothing>() {
 
