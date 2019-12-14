@@ -1,14 +1,42 @@
 package logickt
 
+import funkt.Option
+
 sealed class List<out A> {
 
-    internal object Nil : List<Nothing>()
+    fun getVariable(): Option<Variable> = Option(this as? Variable)
 
-    internal data class Atom<A>(val value: A) : List<A>()
+    fun getPair(): Option<Pair<List<A>, List<A>>> = when (this) {
+        is Cons -> Option(car to cdr)
+        else -> Option()
+    }
 
-    internal data class Cons<A>(val car: List<A>, val cdr: List<A>) : List<A>()
+    internal object Nil : List<Nothing>() {
 
-    class Variable<A>(private val name: String) : List<A>()
+        override fun toString(): String = "Nil"
+    }
+
+    internal data class Atom<A>(val value: A) : List<A>() {
+
+        override fun toString(): String = value.toString()
+    }
+
+    internal data class Cons<A>(val car: List<A>, val cdr: List<A>) : List<A>() {
+
+        override fun toString(): String {
+            return "Cons($car, $cdr)"
+        }
+    }
+
+    class Variable internal constructor(val name: String) : List<Nothing>() {
+
+        override fun toString(): String = name
+    }
+
+    internal data class Reified(val n: Int) : List<Nothing>() {
+
+        override fun toString(): String = "_$n"
+    }
 
     companion object {
 
@@ -25,6 +53,10 @@ sealed class List<out A> {
         fun <A> list(vararg es: List<A>): List<A> = es.foldRight(Nil) { e: List<A>, l: List<A> ->
             Cons(e, l)
         }
+
+        fun variable(name: String): Variable = Variable(name)
+
+        fun reifyName(n: Int): List<Nothing> = Reified(n)
 
         fun <A> list(f: A, vararg es: A): List<A> = Cons(Atom(f), es.foldRight(Nil) { e: A, l: List<A> ->
             Cons(Atom(e), l)
