@@ -14,7 +14,7 @@ dependencies {
 
     implementation("packermann:funkt") {
         version {
-            branch = "for-logickt"
+            branch = "master"
         }
     }
 
