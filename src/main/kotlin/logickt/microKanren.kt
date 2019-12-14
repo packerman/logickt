@@ -2,6 +2,7 @@ package logickt
 
 import funkt.*
 import funkt.Option.Companion.some
+import logickt.List.Companion.variable
 import logickt.List.Variable
 
 typealias Substitution<A> = Assoc<Variable, List<A>>
@@ -56,3 +57,10 @@ fun <A> failure(): Goal<A> = {
 fun <A> disj2(goal1: Goal<A>, goal2: Goal<A>): Goal<A> = { s ->
     goal1(s).interleave(goal2(s))
 }
+
+fun <A> conj2(goal1: Goal<A>, goal2: Goal<A>): Goal<A> = { s ->
+    goal1(s).flatMap(goal2)
+}
+
+fun <R> fresh(name: String, f: (Variable) -> R): R =
+    variable(name).let(f)

@@ -3,12 +3,14 @@ package logickt
 import funkt.Assoc
 import funkt.Option
 import funkt.Option.Companion.some
-import logickt.Eat.Oil
-import logickt.Eat.Olive
+import funkt.toStream
+import logickt.Fruit.Plum
 import logickt.List.Companion.atom
 import logickt.List.Companion.cons
 import logickt.List.Companion.list
 import logickt.List.Companion.variable
+import logickt.Luquid.Oil
+import logickt.Luquid.Olive
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -29,6 +31,7 @@ internal class MicroKanrenKtTest {
 
     private val olive = atom(Olive)
     private val oil = atom(Oil)
+    private val plum = atom(Plum)
 
     @Test
     internal fun testWalk() {
@@ -67,8 +70,8 @@ internal class MicroKanrenKtTest {
 
     @Test
     internal fun testEquiv() {
-        assertStreamEquals(listOf<Substitution<*>>(), equiv(t, f)(Substitution()))
-        assertStreamEquals(listOf<Substitution<*>>(), failure<Nothing>()(Substitution()))
+        assertStreamEquals(listOf(), equiv(t, f)(Substitution()))
+        assertStreamEquals(listOf(), failure<Nothing>()(Substitution()))
         assertStreamEquals(listOf(Substitution<Nothing>()), equiv(f, f)(Substitution()))
         assertStreamEquals(listOf(Substitution<Nothing>()), success<Nothing>()(Substitution()))
         assertStreamEquals(listOf(Substitution(x to y)), equiv(x, y)(Substitution()))
@@ -79,6 +82,28 @@ internal class MicroKanrenKtTest {
         assertStreamEquals(
             listOf(Substitution(x to olive), Substitution(x to oil)),
             disj2(equiv(olive, x), equiv(oil, x))(Substitution())
+        )
+    }
+
+    @Test
+    internal fun testConj2() {
+        assertStreamEquals(
+            listOf(Substitution(y to oil, x to olive)),
+            conj2(equiv(olive, x), equiv(oil, y))(Substitution())
+        )
+        assertStreamEquals(
+            listOf(),
+            conj2(equiv(olive, x), equiv(oil, x))(Substitution())
+        )
+    }
+
+    @Test
+    internal fun testFresh() {
+        assertStreamEquals(
+            listOf(),
+            fresh("kiwi") { fruit ->
+                equiv(plum, fruit)
+            }(Substitution()).take(1).flatMap { it.toStream() }
         )
     }
 }
