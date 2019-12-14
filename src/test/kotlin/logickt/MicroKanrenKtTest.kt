@@ -24,6 +24,7 @@ internal class MicroKanrenKtTest {
     private val v = variable("v")
 
     private val a = atom('a')
+    private val b = atom('b')
     private val e = atom('e')
 
     private val t = atom(true)
@@ -41,7 +42,7 @@ internal class MicroKanrenKtTest {
         assertEquals(y, walk(x, Assoc(x to y, v to x, w to x)))
         assertEquals(y, walk(v, Assoc(x to y, v to x, w to x)))
         assertEquals(y, walk(w, Assoc(x to y, v to x, w to x)))
-        assertEquals(list(x, e, z), walk(w, Assoc(x to atom('b'), z to y, w to list(x, e, z))))
+        assertEquals(list(x, e, z), walk(w, Assoc(x to b, z to y, w to list(x, e, z))))
     }
 
     @Test
@@ -106,5 +107,10 @@ internal class MicroKanrenKtTest {
             }(Substitution()).take(1)
                 .flatMap { it.toStream() }.map { it.second }
         )
+    }
+
+    @Test
+    internal fun walkRecursively() {
+        assertEquals(list(b, e, y), walkRec(w, Assoc(x to b, z to y, w to list(x, e, z))))
     }
 }

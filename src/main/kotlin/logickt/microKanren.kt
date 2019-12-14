@@ -2,6 +2,7 @@ package logickt
 
 import funkt.*
 import funkt.Option.Companion.some
+import logickt.List.Companion.cons
 import logickt.List.Companion.variable
 import logickt.List.Variable
 
@@ -64,3 +65,12 @@ fun <A> conj2(goal1: Goal<A>, goal2: Goal<A>): Goal<A> = { s ->
 
 fun <R> fresh(name: String, f: (Variable) -> R): R =
     variable(name).let(f)
+
+fun <A> walkRec(v: List<A>, s: Substitution<A>): List<A> =
+    walk(v, s).let { w ->
+        w.getVariable().map { it as List<A> }.orElse {
+            w.getPair().map { (car, cdr) ->
+                cons(walkRec(car, s), walkRec(cdr, s))
+            }
+        }.getOrElse(w)
+    }

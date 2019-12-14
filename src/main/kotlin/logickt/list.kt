@@ -25,6 +25,11 @@ sealed class List<out A> {
         override fun toString(): String = name
     }
 
+    internal data class Reified(val n: Int) : List<Nothing>() {
+
+        override fun toString(): String = "_$n"
+    }
+
     companion object {
 
         fun <A> nil(): List<A> = Nil
@@ -42,6 +47,8 @@ sealed class List<out A> {
         }
 
         fun variable(name: String): Variable = Variable(name)
+
+        fun reifyName(n: Int): List<Nothing> = Reified(n)
 
         fun <A> list(f: A, vararg es: A): List<A> = Cons(Atom(f), es.foldRight(Nil) { e: A, l: List<A> ->
             Cons(Atom(e), l)
