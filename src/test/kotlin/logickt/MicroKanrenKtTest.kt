@@ -100,10 +100,11 @@ internal class MicroKanrenKtTest {
     @Test
     internal fun testFresh() {
         assertStreamEquals(
-            listOf(),
+            listOf(plum),
             fresh("kiwi") { fruit ->
                 equiv(plum, fruit)
-            }(Substitution()).take(1).flatMap { it.toStream() }
+            }(Substitution()).take(1)
+                .flatMap { it.toStream() }.map { it.second }
         )
     }
 }
