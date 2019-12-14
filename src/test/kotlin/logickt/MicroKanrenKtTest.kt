@@ -3,6 +3,8 @@ package logickt
 import funkt.Assoc
 import funkt.Option
 import funkt.Option.Companion.some
+import logickt.Eat.Oil
+import logickt.Eat.Olive
 import logickt.List.Companion.atom
 import logickt.List.Companion.cons
 import logickt.List.Companion.list
@@ -24,6 +26,9 @@ internal class MicroKanrenKtTest {
 
     private val t = atom(true)
     private val f = atom(false)
+
+    private val olive = atom(Olive)
+    private val oil = atom(Oil)
 
     @Test
     internal fun testWalk() {
@@ -62,25 +67,18 @@ internal class MicroKanrenKtTest {
 
     @Test
     internal fun testEquiv() {
-        assertEquals(
-            listOf<Substitution<*>>(), equiv(t, f)(Substitution())
-                .asIterable().toList()
-        )
-        assertEquals(
-            listOf<Substitution<*>>(), failure<Nothing>()(Substitution())
-                .asIterable().toList()
-        )
-        assertEquals(
-            listOf(Substitution<Nothing>()), equiv(f, f)(Substitution())
-                .asIterable().toList()
-        )
-        assertEquals(
-            listOf(Substitution<Nothing>()), success<Nothing>()(Substitution())
-                .asIterable().toList()
-        )
-        assertEquals(
-            listOf(Substitution(x to y)), equiv(x, y)(Substitution())
-                .asIterable().toList()
+        assertStreamEquals(listOf<Substitution<*>>(), equiv(t, f)(Substitution()))
+        assertStreamEquals(listOf<Substitution<*>>(), failure<Nothing>()(Substitution()))
+        assertStreamEquals(listOf(Substitution<Nothing>()), equiv(f, f)(Substitution()))
+        assertStreamEquals(listOf(Substitution<Nothing>()), success<Nothing>()(Substitution()))
+        assertStreamEquals(listOf(Substitution(x to y)), equiv(x, y)(Substitution()))
+    }
+
+    @Test
+    internal fun testDisj2() {
+        assertStreamEquals(
+            listOf(Substitution(x to olive), Substitution(x to oil)),
+            disj2(equiv(olive, x), equiv(oil, x))(Substitution())
         )
     }
 }

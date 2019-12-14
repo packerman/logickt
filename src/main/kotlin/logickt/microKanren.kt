@@ -52,3 +52,7 @@ fun <A> success(): Goal<A> = {
 fun <A> failure(): Goal<A> = {
     Stream()
 }
+
+fun <A> disj2(goal1: Goal<A>, goal2: Goal<A>): Goal<A> = { s ->
+    goal1(s).interleave(goal2(s))
+}
