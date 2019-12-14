@@ -132,8 +132,39 @@ internal class MicroKanrenKtTest {
     internal fun testRunGoal() {
         assertStreamEquals(
             listOf(olive, oil),
-            runGoal(5,
-                disj2(equiv(olive, x), equiv(oil, x)))
-                .map(reify<Eat>(x)))
+            runGoal(
+                5,
+                disj2(equiv(olive, x), equiv(oil, x))
+            )
+                .map(reify<Eat>(x))
+        )
+    }
+
+    @Test
+    internal fun testIfte() {
+        assertStreamEquals(
+            listOf(Substitution(y to f)),
+            ifte(success(), equiv(f, y), equiv(t, y))(Substitution())
+        )
+        assertStreamEquals(
+            listOf(Substitution(y to t)),
+            ifte(failure(), equiv(f, y), equiv(t, y))(Substitution())
+        )
+        assertStreamEquals(
+            listOf(Substitution(y to f, x to t)),
+            ifte(equiv(t, x), equiv(f, y), equiv(t, y))(Substitution())
+        )
+        assertStreamEquals(
+            listOf(Substitution(y to f, x to t), Substitution(y to f, x to f)),
+            ifte(disj2(equiv(t, x), equiv(f, x)), equiv(f, y), equiv(t, y))(Substitution())
+        )
+    }
+
+    @Test
+    internal fun testOnce() {
+        assertStreamEquals(
+            listOf(Substitution(y to f, x to t)),
+            ifte(once(disj2(equiv(t, x), equiv(f, x))), equiv(f, y), equiv(t, y))(Substitution())
+        )
     }
 }

@@ -98,3 +98,13 @@ fun <A> runGoal(g: Goal<A>): Stream<Substitution<A>> =
 
 fun <A> runGoal(n: Int, g: Goal<A>): Stream<Substitution<A>> =
     runGoal(g).take(n)
+
+fun <A> ifte(goal1: Goal<A>, goal2: Goal<A>, goal3: Goal<A>): Goal<A> = { s ->
+    val s1 = goal1(s)
+    if (s1.isEmpty()) goal3(s)
+    else s1.flatMap(goal2)
+}
+
+fun <A> once(goal: Goal<A>): Goal<A> = { s ->
+    goal(s).head().toStream()
+}
