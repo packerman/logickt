@@ -43,179 +43,53 @@ internal class FunctionsKtTest {
 
     @Test
     internal fun testWalk() {
-        assertEquals(
-            a,
-            walk(
-                z,
-                Substitution(z to a, x to w, y to z)
-            )
-        )
-        assertEquals(
-            a,
-            walk(
-                y,
-                Substitution(z to a, x to w, y to z)
-            )
-        )
-        assertEquals(
-            w,
-            walk(
-                x,
-                Substitution(z to a, x to w, y to z)
-            )
-        )
-        assertEquals(
-            y,
-            walk(
-                x,
-                Substitution(x to y, v to x, w to x)
-            )
-        )
-        assertEquals(
-            y,
-            walk(
-                v,
-                Substitution(x to y, v to x, w to x)
-            )
-        )
-        assertEquals(
-            y,
-            walk(
-                w,
-                Substitution(x to y, v to x, w to x)
-            )
-        )
-        assertEquals(
-            list(x, e, z),
-            walk(
-                w,
-                Substitution(x to b, z to y, w to list(x, e, z))
-            )
-        )
+        assertEquals(a, walk(z, Substitution(z to a, x to w, y to z)))
+        assertEquals(a, walk(y, Substitution(z to a, x to w, y to z)))
+        assertEquals(w, walk(x, Substitution(z to a, x to w, y to z)))
+        assertEquals(y, walk(x, Substitution(x to y, v to x, w to x)))
+        assertEquals(y, walk(v, Substitution(x to y, v to x, w to x)))
+        assertEquals(y, walk(w, Substitution(x to y, v to x, w to x)))
+        assertEquals(list(x, e, z), walk(w, Substitution(x to b, z to y, w to list(x, e, z))))
     }
 
     @Test
     internal fun testExtendSubstitution() {
-        assertEquals(
-            Option<Any>(),
-            extendSubstitution(
-                x,
-                list(x),
-                Substitution()
-            )
-        )
-        assertEquals(
-            Option<Any>(),
-            extendSubstitution(
-                x,
-                list(y),
-                Substitution(y to x)
-            )
-        )
+        assertEquals(Option<Any>(), extendSubstitution(x, list(x), Substitution()))
+        assertEquals(Option<Any>(), extendSubstitution(x, list(y), Substitution(y to x)))
         val s = Substitution(z to x, y to z)
-        assertEquals(some(e), extendSubstitution(
-            x,
-            e,
-            s
-        ).map { walk(y, it) })
+        assertEquals(some(e), extendSubstitution(x, e, s).map { walk(y, it) })
     }
 
     @Test
     internal fun testOccurs() {
-        assertTrue(
-            occurs(
-                x,
-                x,
-                Substitution()
-            )
-        )
-        assertTrue(
-            occurs(
-                x,
-                list(y),
-                Substitution(y to x)
-            )
-        )
+        assertTrue(occurs(x, x, Substitution()))
+        assertTrue(occurs(x, list(y), Substitution(y to x)))
     }
 
     @Test
     internal fun testUnify() {
-        assertEquals(
-            some(Substitution<Char>()),
-            unify(a, a, Substitution())
-        )
-        assertEquals(
-            some(Substitution(x to a)),
-            unify(x, a, Substitution())
-        )
-        assertEquals(
-            some(Substitution(y to a)),
-            unify(a, y, Substitution())
-        )
-        assertEquals(
-            some(Substitution(y to a, x to e)),
-            unify(
-                cons(x, a),
-                cons(e, y),
-                Substitution()
-            )
-        )
-        assertEquals(
-            Option<Substitution<Char>>(),
-            unify(
-                cons(a, x),
-                cons(e, y),
-                Substitution()
-            )
-        )
-        assertEquals(
-            Option<Substitution<Char>>(),
-            unify(
-                cons(x, a),
-                cons(e, y),
-                Substitution(x to a)
-            )
-        )
+        assertEquals(some(Substitution<Char>()), unify(a, a, Substitution()))
+        assertEquals(some(Substitution(x to a)), unify(x, a, Substitution()))
+        assertEquals(some(Substitution(y to a)), unify(a, y, Substitution()))
+        assertEquals(some(Substitution(y to a, x to e)), unify(cons(x, a), cons(e, y), Substitution()))
+        assertEquals(Option<Substitution<Char>>(), unify(cons(a, x), cons(e, y), Substitution()))
+        assertEquals(Option<Substitution<Char>>(), unify(cons(x, a), cons(e, y), Substitution(x to a)))
     }
 
     @Test
     internal fun testEquiv() {
         assertStreamEquals(listOf(), equiv(t, f)(Substitution()))
         assertStreamEquals(listOf(), failure<Nothing>()(Substitution()))
-        assertStreamEquals(
-            listOf(Substitution<Nothing>()), equiv(
-                f,
-                f
-            )(
-                Substitution()
-            )
-        )
-        assertStreamEquals(
-            listOf(Substitution<Nothing>()), success<Nothing>()(
-                Substitution()
-            )
-        )
-        assertStreamEquals(
-            listOf(Substitution(x to y)), equiv(
-                x,
-                y
-            )(
-                Substitution()
-            )
-        )
+        assertStreamEquals(listOf(Substitution<Nothing>()), equiv(f, f)(Substitution()))
+        assertStreamEquals(listOf(Substitution<Nothing>()), success<Nothing>()(Substitution()))
+        assertStreamEquals(listOf(Substitution(x to y)), equiv(x, y)(Substitution()))
     }
 
     @Test
     internal fun testDisj2() {
         assertStreamEquals(
-            listOf(
-                Substitution(x to olive),
-                Substitution(x to oil)
-            ),
-            disj2(
-                equiv(olive, x),
-                equiv(oil, x)
-            )(Substitution())
+            listOf(Substitution(x to olive), Substitution(x to oil)),
+            disj2(equiv(olive, x), equiv(oil, x))(Substitution())
         )
     }
 
@@ -223,18 +97,9 @@ internal class FunctionsKtTest {
     internal fun testConj2() {
         assertStreamEquals(
             listOf(Substitution(y to oil, x to olive)),
-            conj2(
-                equiv(olive, x),
-                equiv(oil, y)
-            )(Substitution())
+            conj2(equiv(olive, x), equiv(oil, y))(Substitution())
         )
-        assertStreamEquals(
-            listOf(),
-            conj2(
-                equiv(olive, x),
-                equiv(oil, x)
-            )(Substitution())
-        )
+        assertStreamEquals(listOf(), conj2(equiv(olive, x), equiv(oil, x))(Substitution()))
     }
 
     @Test
@@ -252,10 +117,7 @@ internal class FunctionsKtTest {
     internal fun walkRecursively() {
         assertEquals(
             list(b, e, y),
-            walkRec(
-                w,
-                Substitution(x to b, z to y, w to list(x, e, z))
-            )
+            walkRec(w, Substitution(x to b, z to y, w to list(x, e, z)))
         )
     }
 
@@ -266,9 +128,8 @@ internal class FunctionsKtTest {
         val a3 = w to list(v, u)
         val s = Substitution(a1, a2, a3)
         assertEquals(
-            list(_0, list(_1, _0), corn, _2, list(list(ice), _2)), reify<Eat>(
-                x
-            )(s)
+            list(_0, list(_1, _0), corn, _2, list(list(ice), _2)),
+            reify<Eat>(x)(s)
         )
     }
 
@@ -276,14 +137,7 @@ internal class FunctionsKtTest {
     internal fun testRunGoal() {
         assertStreamEquals(
             listOf(olive, oil),
-            runGoal(
-                5,
-                disj2(
-                    equiv(olive, x),
-                    equiv(oil, x)
-                )
-            )
-                .map(reify<Eat>(x))
+            runGoal(5, disj2(equiv(olive, x), equiv(oil, x))).map(reify<Eat>(x))
         )
     }
 
@@ -291,43 +145,19 @@ internal class FunctionsKtTest {
     internal fun testIfte() {
         assertStreamEquals(
             listOf(Substitution(y to f)),
-            ifte(
-                success(),
-                equiv(f, y),
-                equiv(t, y)
-            )(Substitution())
+            ifte(success(), equiv(f, y), equiv(t, y))(Substitution())
         )
         assertStreamEquals(
             listOf(Substitution(y to t)),
-            ifte(
-                failure(),
-                equiv(f, y),
-                equiv(t, y)
-            )(Substitution())
+            ifte(failure(), equiv(f, y), equiv(t, y))(Substitution())
         )
         assertStreamEquals(
             listOf(Substitution(y to f, x to t)),
-            ifte(
-                equiv(t, x),
-                equiv(f, y),
-                equiv(t, y)
-            )(Substitution())
+            ifte(equiv(t, x), equiv(f, y), equiv(t, y))(Substitution())
         )
         assertStreamEquals(
-            listOf(
-                Substitution(y to f, x to t),
-                Substitution(y to f, x to f)
-            ),
-            ifte(
-                disj2(
-                    equiv(
-                        t,
-                        x
-                    ), equiv(f, x)
-                ),
-                equiv(f, y),
-                equiv(t, y)
-            )(Substitution())
+            listOf(Substitution(y to f, x to t), Substitution(y to f, x to f)),
+            ifte(disj2(equiv(t, x), equiv(f, x)), equiv(f, y), equiv(t, y))(Substitution())
         )
     }
 
@@ -335,18 +165,7 @@ internal class FunctionsKtTest {
     internal fun testOnce() {
         assertStreamEquals(
             listOf(Substitution(y to f, x to t)),
-            ifte(
-                once(
-                    disj2(
-                        equiv(
-                            t,
-                            x
-                        ), equiv(f, x)
-                    )
-                ),
-                equiv(f, y),
-                equiv(t, y)
-            )(Substitution())
+            ifte(once(disj2(equiv(t, x), equiv(f, x))), equiv(f, y), equiv(t, y))(Substitution())
         )
     }
 }
