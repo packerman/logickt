@@ -1,7 +1,8 @@
-package logickt
+package logickt.microkanren
 
 import funkt.*
 import funkt.Option.Companion.some
+import logickt.List
 import logickt.List.Companion.cons
 import logickt.List.Companion.reifyName
 import logickt.List.Companion.variable

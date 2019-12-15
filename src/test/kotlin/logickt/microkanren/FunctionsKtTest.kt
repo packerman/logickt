@@ -1,19 +1,21 @@
-package logickt
+package logickt.microkanren
 
 import funkt.Option
 import funkt.Option.Companion.some
 import funkt.toStream
+import logickt.Eat
 import logickt.Eat.*
 import logickt.List.Companion.atom
 import logickt.List.Companion.cons
 import logickt.List.Companion.list
 import logickt.List.Companion.reifyName
 import logickt.List.Companion.variable
+import logickt.assertStreamEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
-internal class MicroKanrenKtTest {
+internal class FunctionsKtTest {
 
     private val x = variable("x")
     private val y = variable("y")
@@ -97,10 +99,7 @@ internal class MicroKanrenKtTest {
             listOf(Substitution(y to oil, x to olive)),
             conj2(equiv(olive, x), equiv(oil, y))(Substitution())
         )
-        assertStreamEquals(
-            listOf(),
-            conj2(equiv(olive, x), equiv(oil, x))(Substitution())
-        )
+        assertStreamEquals(listOf(), conj2(equiv(olive, x), equiv(oil, x))(Substitution()))
     }
 
     @Test
@@ -116,7 +115,10 @@ internal class MicroKanrenKtTest {
 
     @Test
     internal fun walkRecursively() {
-        assertEquals(list(b, e, y), walkRec(w, Substitution(x to b, z to y, w to list(x, e, z))))
+        assertEquals(
+            list(b, e, y),
+            walkRec(w, Substitution(x to b, z to y, w to list(x, e, z)))
+        )
     }
 
     @Test
@@ -125,18 +127,17 @@ internal class MicroKanrenKtTest {
         val a2 = y to corn
         val a3 = w to list(v, u)
         val s = Substitution(a1, a2, a3)
-        assertEquals(list(_0, list(_1, _0), corn, _2, list(list(ice), _2)), reify<Eat>(x)(s))
+        assertEquals(
+            list(_0, list(_1, _0), corn, _2, list(list(ice), _2)),
+            reify<Eat>(x)(s)
+        )
     }
 
     @Test
     internal fun testRunGoal() {
         assertStreamEquals(
             listOf(olive, oil),
-            runGoal(
-                5,
-                disj2(equiv(olive, x), equiv(oil, x))
-            )
-                .map(reify<Eat>(x))
+            runGoal(5, disj2(equiv(olive, x), equiv(oil, x))).map(reify<Eat>(x))
         )
     }
 
