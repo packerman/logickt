@@ -31,12 +31,8 @@ fun <A> unify(u: List<A>, v: List<A>, s: Substitution<A>): Option<Substitution<A
         walk(v, s).let { wv ->
             if (wu == wv) some(s)
             else cond(
-                wu.getVariable().flatMap {
-                    extendSubstitution(it, wv, s)
-                }, {
-                    wv.getVariable().flatMap {
-                        extendSubstitution(it, wu, s)
-                    }
+                wu.getVariable().flatMap { extendSubstitution(it, wv, s) }, {
+                    wv.getVariable().flatMap { extendSubstitution(it, wu, s) }
                 }, {
                     wu.getPair().flatMap { (carU, cdrU) ->
                         wv.getPair().flatMap { (carV, cdrV) ->
